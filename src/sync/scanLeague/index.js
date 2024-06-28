@@ -6,7 +6,7 @@ const getLastBracketId = require('./getLastBracketId')
 const getBracket = require('./getBracket')
 module.exports = async(info = {})=>{
   let lastBracketId = await getLastBracketId(info.eventInstanceId, info.league, info.lastBracketId || 5)
-  if(!lastBracketId) return
+  if(!lastBracketId || lastBracketId < 0) return
   if(lastBracketId !== info.lastBracketId){
     await mongo.set('gaEvents', { _id: info.eventInstanceId }, { [`leagues.${info.league}.lastBracketId`]: lastBracketId || 0})
     log.debug(`found new lastBracketId for ${info.league} season ${info.season} of ${lastBracketId}`)
