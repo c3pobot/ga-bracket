@@ -2,15 +2,12 @@
 const log = require('logger')
 log.setLevel('debug');
 const mongo = require('mongoclient')
-const remoteMongo = require('./mongo')
 const sync = require('./sync')
 const swgohClient = require('./swgohClient')
 const checkMongo = ()=>{
   try{
     let status = mongo.status()
     if(status) log.debug(`local mongo connection ready...`)
-    if(status) status = remoteMongo.status()
-    if(status) log.debug(`remote mongo connection ready...`)
     if(status){
       checkApi()
       return

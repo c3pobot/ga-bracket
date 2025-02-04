@@ -1,7 +1,6 @@
 'use strict'
 const log = require('logger')
 const mongo = require('mongoclient')
-const remoteMongo = require('src/mongo')
 const checkLeagues = require('./checkLeagues')
 const checkComplete = require('./checkComplete')
 const leagues = ['KYBER', 'AURODIUM', 'CHROMIUM', 'BRONZIUM', 'CARBONITE']
@@ -31,15 +30,11 @@ const formatEvent = (gaEvent = {}, instance = {})=>{
 const getEvent = async(gaEvent = {}, instance = {})=>{
   if(!instance.id) return
   let exists = (await mongo.find('gaEvents', { _id: `${gaEvent.id}:${instance.id}` }, { _id: 0}))[0]
-  if(exists?.eventInstanceId){
-    let status = await remoteMongo.set('gaEvents', { _id: `${gaEvent.id}:${instance.id}` }, exists)
-    if(!status) return
-    return exists
-  }
+  if(exists?.eventInstanceId) return exists
+
   let tempEvent = formatEvent(gaEvent, instance)
   if(!tempEvent?.id) return
-  let status = await remoteMongo.set('gaEvents', { _id: `${gaEvent.id}:${instance.id}` }, tempEvent)
-  if(!status) return
+
   await mongo.set('gaEvents', { _id: tempEvent.eventInstanceId }, tempEvent)
   return tempEvent
 }
@@ -52,6 +47,6 @@ module.exports = async(gaEvent = {})=>{
     if(tempEvent.leaderboardScanComplete) continue
     if(tempEvent.startTime > timeNow) continue
     await checkLeagues(tempEvent)
-    if(timeNow > tempEvent.endTime && tempEvent.id) await checkComplete(tempEvent.id)
+    //if(timeNow > tempEvent.endTime && tempEvent.id) await checkComplete(tempEvent.id)
   }
 }

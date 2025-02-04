@@ -1,7 +1,6 @@
 'use strict'
 const log = require('logger')
 const mongo = require('mongoclient')
-const remoteMongo = require('src/mongo')
 module.exports = async(id)=>{
   let gaEvent = (await mongo.find('gaEvents', { _id: id }))[0]
   if(!gaEvent) return
@@ -13,9 +12,6 @@ module.exports = async(id)=>{
     if(brackets?.length && gaEvent.leagues[i]?.lastBracketId && brackets?.length === gaEvent.leagues[i].lastBracketId + 1) done++
   }
   if(count > 0 && count == done){
-
-    let status = await remoteMongo.set('gaEvents', { _id: id}, { leaderboardScanComplete: true, TTL: gaEvent.TTL })
-    if(!status) return
     await mongo.set('gaEvents', { _id: id}, { leaderboardScanComplete: true, TTL: gaEvent.TTL })
     log.info(`Closed leadboard scan for ${gaEvent.season} date ${gaEvent.date}...`)
   }
