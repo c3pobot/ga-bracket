@@ -47,6 +47,6 @@ module.exports = async(gaEvent = {})=>{
     if(tempEvent.leaderboardScanComplete) continue
     if(tempEvent.startTime > timeNow) continue
     await checkLeagues(tempEvent)
-    //if(timeNow > tempEvent.endTime && tempEvent.id) await checkComplete(tempEvent.id)
+    if(timeNow > tempEvent.endTime && tempEvent.id) await checkComplete(tempEvent.id)
   }
 }
