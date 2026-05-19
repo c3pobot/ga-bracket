@@ -9,6 +9,7 @@ const saveBracket = async(info = {}, bracketId, bracket = {})=>{
 }
 module.exports = async(info = {}, bracketId)=>{
   let data = await swgohClient('getLeaderboard', { groupId: info.groupId+':'+bracketId, leaderboardType: 4, combatType: 0 })
-  if(!data?.player || data?.player?.length == 0) return
-  return await saveBracket(info, bracketId, data)
+  let player = data?.leaderboard[0]?.player
+  if(!player || player?.length == 0) return
+  return await saveBracket(info, bracketId, { player: player })
 }

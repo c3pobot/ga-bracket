@@ -4,7 +4,7 @@ COPY package*.json ./
 RUN npm install --omit=dev
 
 FROM node:20-alpine AS app
-LABEL org.opencontainers.image.source https://github.com/c3pobot/ga-bracket
+LABEL org.opencontainers.image.source=https://github.com/c3pobot/ga-bracket
 WORKDIR /app
 ENV NODE_PATH=/app
 RUN mkdir -p /app/data/files && chown -R node:node /app/data/files
