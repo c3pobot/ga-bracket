@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "update": "chmod a+x updategitdependency.sh && ./updategitdependency.sh",
@@ -13,8 +14,6 @@
   "license": "ISC",
   "dependencies": {
     "async": "^3.2.5",
-    "logger": "github:c3pobot/logger",
-    "mongoclient": "github:c3pobot/mongoclient",
-    "node-fetch": "^2.6.7"
+    "mongo-cache": "github:c3pobot/mongo-cache"
   }
 }

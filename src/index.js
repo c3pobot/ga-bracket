@@ -1,47 +1,46 @@
-'use strict'
-const log = require('logger')
-log.setLevel('debug');
-const mongo = require('mongoclient')
-const sync = require('./sync')
-const swgohClient = require('./swgohClient')
-const checkMongo = ()=>{
+import log from './logger.js'
+import cache from './cache.js'
+import swgohClient from './swgoh_client.js'
+import sync from './sync/index.js'
+import checkIndexes from './check_indexes.js'
+
+async function checkGameClient(){
   try{
-    let status = mongo.status()
-    if(status) log.debug(`local mongo connection ready...`)
+    let data = await swgohClient('metadata')
+    if(data?.latestGamedataVersion){
+      log.info(`game client connected...`)
+      return checkCache()
+    }
+    setTimeout(checkGameClient, 5000)
+  }catch(e){
+    log.error(e)
+    setTimeout(checkGameClient, 5000)
+  }
+}
+function checkCache(){
+  try{
+    let status = cache.status()
     if(status){
-      checkApi()
-      return
+      log.info(`cache is ready...`)
+      return updateIndexes()
     }
-    log.debug(`mongo connection(s) not ready....`)
-    setTimeout(checkMongo, 5000)
+    setTimeout(checkCache, 5000)
   }catch(e){
     log.error(e)
-    setTimeout(checkMongo, 5000)
+    setTimeout(checkCache, 5000)
   }
 }
-const checkApi = async()=>{
+async function updateIndexes(){
   try{
-    let meta = await swgohClient('metadata')
-    if(meta?.latestGamedataVersion){
-      log.debug(`Game Api ready...`)
-      startSync()
-      return
+    let status = await checkIndexes()
+    if(status){
+      log.info(`cache indexes ready...`)
+      return sync.start()
     }
-    setTimeout(checkApi, 5000)
+    setTimeout(updateIndexes, 5000)
   }catch(e){
     log.error(e)
-    setTimeout(checkApi, 5000)
+    setTimeout(updateIndexes, 5000)
   }
 }
-const startSync = async()=>{
-  try{
-    let syncTime = 5
-    let status = await sync()
-    if(status) syncTime = 60
-    setTimeout(startSync, syncTime * 1000)
-  }catch(e){
-    log.error(e)
-    setTimeout(startSync, 5000)
-  }
-}
-checkMongo()
+checkGameClient()

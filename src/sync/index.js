@@ -1,24 +1,24 @@
-'use strict'
-const log = require('logger')
-const swgohClient = require('src/swgohClient')
-const checkInstance = require('./checkInstance')
-
-const getEvents = async()=>{
-  let events = await swgohClient('getEvents')
-  if(!events?.gameEvent || events?.gameEvent?.length == 0) return []
-  return events.gameEvent.filter(x=>x.type == 10)
-}
-
-module.exports = async()=>{
+import log from '../logger.js'
+import { gaCache } from '../cache.js'
+import checkEvent from './check_event.js'
+import updateMetaList from './update_meta_list.js'
+async function sync(){
   try{
-    let gaEvents = await getEvents()
-    if(!gaEvents || gaEvents?.length == 0) return
+    let gaEvents = (await gaCache.all('gaEventList', {}, { _id: 0, groupId: 1, bracketScanComplete: 1, startTime: 1, endTime: 1 }))?.filter(x=>!x.bracketScanComplete)
+    let timeNow = Date.now()
     for(let i in gaEvents){
-      if(!gaEvents[i]?.instance || gaEvents[i].instance?.length == 0) continue
-      await checkInstance(gaEvents[i])
+
+      if(!gaEvents[i].groupId || !gaEvents[i].endTime || !gaEvents[i].startTime) continue
+      if(gaEvents[i].endTime < timeNow) await gaCache.set('gaEventList', { _id: gaEvents[i].groupId }, { bracketScanComplete: true })
+      if(gaEvents[i].startTime < timeNow) await checkEvent( gaEvents[i].groupId )
     }
-    return true
+    await updateMetaList()
+    setTimeout(sync, 5000)
   }catch(e){
     log.error(e)
+    setTimeout(sync, 5000)
   }
+}
+export default {
+  start: sync
 }
