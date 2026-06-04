@@ -4,14 +4,16 @@ import { gaCache } from './cache.js'
 const collections = [
   { collection: 'bracketList', indexes: [
     { key: { TTL: 1 }, opts: { name: '_TTL', expireAfterSeconds: 60 * 24 * 3600 } },
-    { key: { groupId: 1 }, opts: { name: '_groupId' } }
+    { key: { groupId: 1 }, opts: { name: '_groupId' } },
+    { key: { playerKey: 1 }, opts: { name: '_playerKey' } }
   ] },
   { collection: 'metaList', indexes: [
     { key: { TTL: 1 }, opts: { name: '_TTL', expireAfterSeconds: 365 * 24 * 3600 } }
   ] },
   { collection: 'gaEventList', indexes: [
     { key: { TTL: 1 }, opts: { name: '_TTL', expireAfterSeconds: 60 * 24 * 3600 } },
-    { key: { league: 1 }, opts: { name: '_league' } }
+    { key: { league: 1 }, opts: { name: '_league' } },
+    { key: { eventInstanceId: 1 }, opts: { name: '_eventInstanceId' } }
   ] },
 ]
 

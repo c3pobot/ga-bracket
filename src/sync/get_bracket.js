@@ -9,8 +9,9 @@ async function saveBracket(gaEvent, bracketId, bracket){
   if(!gaEvent?.groupId || !bracket?.player || bracket?.player?.length == 0) return
   let players = bracket.player?.map(x=>{ return { id: x.id, name: x.name, guildId: x.guild?.id, guildName: x.guild?.name }})
   let playerIds = bracket.player.map(x=>x.id)
+  let playerKey = `-${playerIds.join('-')}`
   let tempObj = {
-    players, playerIds, seasonId: gaEvent.seasonId, instanceId: gaEvent.instanceId, groupId: gaEvent.groupId, bracketId: bracketId, league: gaEvent.league, startTime: gaEvent.startTime,
+    players, playerIds, playerKey, seasonId: gaEvent.seasonId, instanceId: gaEvent.instanceId, groupId: gaEvent.groupId, bracketId: bracketId, league: gaEvent.league, startTime: gaEvent.startTime,
     endTime: gaEvent.endTime, mode: gaEvent.mode, season: gaEvent.season, date: gaEvent.date, updated: Date.now(), TTL: new Date(gaEvent.endTime)
   }
   return await gaCache.set('bracketList', { _id: `${gaEvent.groupId}:${bracketId}` }, tempObj)

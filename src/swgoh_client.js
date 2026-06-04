@@ -2,12 +2,17 @@ import log from './logger.js'
 
 const GAME_CLIENT_URL = process.env.GAME_CLIENT_URL || 'http://swgoh-client-tw.c3po.svc.cluster.local:3000', GETRoutes = new Set(['enums']), retryCount = +process.env.CLIENT_RETRY_COUNT || 6
 
+async function parseResponse(r){
+  let contentType = r?.headers.get("content-type")
+  if(contentType && contentType?.indexOf("application/json") !== -1) return await r?.json()
+}
+
 async function requestWithRetry(uri, opts, count = 0){
   try{
     opts.signal = AbortSignal.timeout(30000)
     let r = await fetch(uri, opts)
     count++
-    let res = await r?.json()
+    let res = await parseResponse(r)
     if(!r.ok && !res?.code && count < retryCount) return await requestWithRetry(uri, opts, count)
     if((!r.ok || res?.code === 6 || (r?.status === 400 && res?.message && res?.code !== 4)) && count < retryCount) return await requestWithRetry(uri, opts, count)
     if(!r.ok){
