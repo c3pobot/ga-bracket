@@ -1,6 +1,6 @@
 import log from './logger.js'
 
-const GAME_CLIENT_URL = process.env.GAME_CLIENT_URL || 'http://swgoh-client-tw.c3po.svc.cluster.local:3000', GETRoutes = new Set(['enums']), retryCount = +process.env.CLIENT_RETRY_COUNT || 6
+const GAME_CLIENT_URL = process.env.GAME_CLIENT_URL || 'http://swgoh-client:3000', GETRoutes = new Set(['enums']), retryCount = +process.env.CLIENT_RETRY_COUNT || 6
 
 async function parseResponse(r){
   let contentType = r?.headers.get("content-type")
