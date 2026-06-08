@@ -17,8 +17,8 @@ async function requestWithRetry(uri, opts, count = 0){
     if((!r.ok || res?.code === 6 || (r?.status === 400 && res?.message && res?.code !== 4)) && count < retryCount) return await requestWithRetry(uri, opts, count)
     if(!r.ok){
       if(res?.code == 6) return
-      log.debug(`[swgoh-client] : ${uri}`)
-      if(res) log.debug(JSON.stringify(res))
+      log.error(`[swgoh-client] : ${uri}`)
+      if(res) log.error(JSON.stringify(res))
       return
     }
     return res
